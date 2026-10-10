@@ -1,1 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personas National High School - Client Satisfaction Monitoring Tool</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for Admin Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .rating-btn:hover { transform: translateY(-2px); }
+        .transition-all { transition: all 0.25s ease-in-out; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col justify-between" id="appBody">
 
+    <!-- Navbar Header -->
+    <header class="bg-emerald-800 text-white shadow-lg border-b-4 border-amber-400 transition-colors duration-300" id="mainHeader">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-4">
+                <!-- Customizable School Logo Container -->
+                <div id="schoolLogoContainer" class="w-16 h-16 rounded-full bg-white/10 p-1 flex items-center justify-center shadow-inner overflow-hidden flex-shrink-0">
+                    <img id="headerSchoolLogo" src="" alt="School Logo" class="w-full h-full object-contain rounded-full hidden" onerror="this.classList.add('hidden'); document.getElementById('headerLogoFallback').classList.remove('hidden');" />
+                    <!-- Fallback SVG Seal -->
+                    <div id="headerLogoFallback" class="w-full h-full rounded-full bg-amber-400 text-emerald-900 flex items-center justify-center font-bold text-2xl shadow">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold tracking-wider text-amber-300 uppercase block" id="headerSubtext">Department of Education • Division Office</span>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight" id="headerTitle">Personas National High School</h1>
+                    <p class="text-xs text-emerald-100 opacity-90" id="headerSubtitle">Client Satisfaction Monitoring (CSM) Tool</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <button id="navSurveyBtn" onclick="switchTab('survey')" class="px-4 py-2 text-sm font-semibold rounded-lg bg-white/10 hover:bg-white/20 transition flex items-center gap-2 border border-white/20">
+                    <i class="fas fa-file-pen"></i> <span>Feedback Form</span>
+                </button>
+                <button id="navAdminBtn" onclick="switchTab('admin')" class="px-4 py-2 text-sm font-semibold rounded-lg bg-amber-400 text-slate-900 hover:bg-amber-300 transition flex items-center gap-2 shadow-sm">
+                    <i class="fas fa-user-shield"></i> <span>Admin Dashboard</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 flex-grow w-full">
+        <!-- SURVEY SECTION -->
+        <div id="surveySection" class="space-y-6">
+            <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-slate-100">
+                <div class="border-b border-slate-100 pb-5 mb-6">
+                    <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fas fa-clipboard-check text-emerald-600" id="formIcon"></i>
+                        <span>Client Feedback Form</span>
+                    </h2>
+                    <p class="text-slate-600 text-sm mt-1">
+                        Your feedback helps us continuously improve our school services, academic instruction, facilities, and campus environment.
+                    </p>
+                </div>
+
+                <form id="feedbackForm" onsubmit="handleFormSubmit(event)" class="space-y-8">
+                    <!-- Visitor Details Block -->
+                    <div class="bg-slate-50/80 rounded-xl p-5 border border-slate-200/80 space-y-4">
+                        <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fas fa-id-card text-emerald-600"></i> Visitor Information
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1" for="visitorName">
+                                    Full Name <span class="text-xs text-slate-400 font-normal">(Optional / Optional for Visitors)</span>
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                        <i class="fas fa-user text-sm"></i>
+                                    </span>
+                                    <input type="text" id="visitorName" placeholder="e.g. Juan De La Cruz" class="w-full pl-9 pr-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white" />
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1" for="visitorContact">
+                                    Contact Info <span class="text-xs text-slate-400 font-normal">(Phone or Email)</span>
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                        <i class="fas fa-envelope-phone text-sm"></i>
+                                    </span>
+                                    <input type="text" id visitorContact" placeholder="0917XXXXXXX or name@email.com" class="w-full pl-9 pr-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1" for="clientType">
+                                    Client Category <span class="text-rose-500">*</span>
+                                </label>
+                                <select id="clientType" required class="w-full p-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white">
+                                    <option value="">Select Category...</option>
+                                    <option value="Parent/Guardian">Parent / Guardian</option>
+                                    <option value="Student">Student</option>
+                                    <option value="Alumni">Alumni</option>
+                                    <option value="General Public / Visitor">General Public / Visitor</option>
+                                    <option value="Government Employee">Government Employee</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1" for="officeVisited">
+                                    Office / Service Visited <span class="text-rose-500">*</span>
+                                </label>
+                                <select id="officeVisited" required class="w-full p-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white">
+                                    <option value="">Select Office/Service...</option>
+                                    <option value="Principal's Office">Principal's Office</option>
+                                    <option value="Registrar / Records">Registrar / Student Records</option>
+                                    <option value="Guidance Office">Guidance & Counseling</option>
+                                    <option value="Faculty / Teachers">Faculty / Classrooms</option>
+                                    <option value="Cashier / Accounting">Cashier / Finance</option>
+                                    <option value="School Library">School Library</option>
+                                    <option value="Property / Supply Office">Property & Supply</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- School Service Quality Dimensions Section -->
+                    <div class="space-y-6">
+                        <div class="border-b border-slate-200 pb-2">
+                            <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fas fa-star text-amber-500"></i> School Quality Evaluation
+                            </h3>
+                            <p class="text-xs text-slate-500">Please rate your satisfaction across key school quality dimensions (1 = Very Dissatisfied, 5 = Very Satisfied).</p>
+                        </div>
+
+                        <!-- Dynamic Questions Container -->
+                        <div id="schoolQuestionsContainer" class="space-y-6">
+                            <!-- Injected dynamically via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Suggestions & Feedback Box -->
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider" for="userFeedback">
+                            Comments, Commendations, or Suggestions
+                        </label>
+                        <textarea id="userFeedback" rows="3" placeholder="Share your experience or how Personas NHS can serve you better..." class="w-full p-3 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"></textarea>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="pt-2">
+                        <button type="submit" id="submitFormBtn" class="w-full sm:w-auto px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2 text-base cursor-pointer">
+                            <i class="fas fa-paper-plane"></i> Submit Evaluation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ADMIN DASHBOARD SECTION -->
+        <div id="adminSection" class="hidden space-y-6">
+            <!-- Login Box if locked -->
+            <div id="adminLoginBox" class="bg-white rounded-2xl shadow-xl p-8 max-w-md mx-auto border border-slate-100 text-center">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Admin Security Portal</h3>
+                <p class="text-xs text-slate-500 mb-6">Enter password to access visitor feedback records and settings.</p>
+                
+                <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                    <div>
+                        <input type="password" id="adminPasswordInput" placeholder="Enter password (default: admin123)" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm text-center" />
+                    </div>
+                    <button type="submit" class="w-full py-2.5 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition">
+                        Unlock Dashboard
+                    </button>
+                </form>
+            </div>
+
+            <!-- Main Admin Panel Content -->
+            <div id="adminDashboardContent" class="hidden space-y-6">
+                <!-- Top Control Bar -->
+                <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full uppercase">Admin Session Active</span>
+                        <h2 class="text-lg font-bold text-slate-800">Personas NHS Dashboard</h2>
+                    </div>
+                    
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <button onclick="switchAdminSubTab('analytics')" id="subTabAnalytics" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white shadow-sm">
+                            <i class="fas fa-chart-line"></i> Analytics & Responses
+                        </button>
+                        <button onclick="switchAdminSubTab('settings')" id="subTabSettings" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200">
+                            <i class="fas fa-cog"></i> School Branding & Questions
+                        </button>
+                        <button onclick="lockAdmin()" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SUB TAB 1: ANALYTICS & RESPONSES -->
+                <div id="adminTabAnalytics" class="space-y-6">
+                    <!-- Key Stats Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 uppercase">Total Submissions</p>
+                                <p class="text-2xl font-black text-slate-800 mt-1" id="statTotalCount">0</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 uppercase">Average Score</p>
+                                <p class="text-2xl font-black text-emerald-600 mt-1" id="statAvgRating">0.0 / 5</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 uppercase">Satisfaction Index</p>
+                                <p class="text-2xl font-black text-indigo-600 mt-1" id="statSatisfactionPct">0%</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl">
+                                <i class="fas fa-smile"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 uppercase">Top Visitor Group</p>
+                                <p class="text-lg font-bold text-slate-800 mt-1 truncate max-w-[120px]" id="statTopClient">None</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-xl">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart Container -->
+                    <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                        <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-chart-bar text-emerald-600"></i> Satisfaction Score per School Quality Dimension
+                        </h3>
+                        <div class="h-64 relative">
+                            <canvas id="dimensionChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Filterable Responses Table -->
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50">
+                            <div class="flex items-center gap-2 w-full sm:w-auto">
+                                <input type="text" id="adminSearchInput" oninput="renderAdminTable()" placeholder="Search visitor name, office, or comments..." class="px-3 py-1.5 text-xs border border-slate-300 rounded-lg w-full sm:w-64 focus:ring-2 focus:ring-emerald-500" />
+                                <select id="adminFilterOffice" onchange="renderAdminTable()" class="px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500">
+                                    <option value="ALL">All Offices</option>
+                                    <option value="Principal's Office">Principal's Office</option>
+                                    <option value="Registrar / Records">Registrar / Records</option>
+                                    <option value="Guidance Office">Guidance Office</option>
+                                    <option value="Faculty / Teachers">Faculty / Teachers</option>
+                                    <option value="Cashier / Accounting">Cashier / Accounting</option>
+                                    <option value="School Library">School Library</option>
+                                    <option value="Property / Supply Office">Property / Supply</option>
+                                </select>
+                            </div>
+
+                            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                                <button onclick="seedSampleData()" class="px-3 py-1.5 text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg font-semibold transition">
+                                    <i class="fas fa-magic"></i> Seed Data
+                                </button>
+                                <button onclick="exportToCSV()" class="px-3 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold shadow transition">
+                                    <i class="fas fa-file-excel"></i> Export CSV
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Responses Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-600">
+                                <thead class="bg-slate-100 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-3">Date</th>
+                                        <th class="p-3">Visitor Name</th>
+                                        <th class="p-3">Category</th>
+                                        <th class="p-3">Office</th>
+                                        <th class="p-3 text-center">Avg Rating</th>
+                                        <th class="p-3">Comments</th>
+                                        <th class="p-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminTableBody" class="divide-y divide-slate-100">
+                                    <!-- Injected dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB TAB 2: BRANDING & CUSTOM QUESTIONS -->
+                <div id="adminTabSettings" class="hidden space-y-6">
+                    <!-- Branding Settings Box -->
+                    <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
+                        <h3 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-2 flex items-center gap-2">
+                            <i class="fas fa-image text-emerald-600"></i> School Logo & Header Customization
+                        </h3>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">School Title</label>
+                                <input type="text" id="settingSchoolTitle" class="w-full p-2 text-sm border border-slate-300 rounded-lg" value="Personas National High School">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Sub-Header Banner Text</label>
+                                <input type="text" id="settingSubtext" class="w-full p-2 text-sm border border-slate-300 rounded-lg" value="Department of Education • Division Office">
+                            </div>
+                        </div>
+
+                        <!-- Image / Logo Upload Section -->
+                        <div class="border border-dashed border-slate-300 rounded-xl p-4 bg-slate-50 flex flex-col md:flex-row items-center gap-4">
+                            <div class="w-20 h-20 bg-white rounded-full border border-slate-200 flex items-center justify-center overflow-hidden shadow-sm flex-shrink-0">
+                                <img id="settingLogoPreview" src="" class="w-full h-full object-contain hidden" alt="Logo Preview" />
+                                <i id="settingLogoPreviewFallback" class="fas fa-school text-3xl text-slate-400"></i>
+                            </div>
+
+                            <div class="flex-grow space-y-2 w-full">
+                                <label class="block text-xs font-bold text-slate-700">School Logo Image Source</label>
+                                <div class="flex flex-col sm:flex-row gap-2">
+                                    <input type="text" id="settingLogoUrl" placeholder="Paste Logo Image URL here..." oninput="updateLogoPreview()" class="flex-grow p-2 text-xs border border-slate-300 rounded-lg" />
+                                    <label class="px-3 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 cursor-pointer text-center">
+                                        <i class="fas fa-upload"></i> Upload File
+                                        <input type="file" id="settingLogoFileInput" accept="image/*" class="hidden" onchange="handleLogoFileUpload(event)" />
+                                    </label>
+                                </div>
+                                <p class="text-[11px] text-slate-500">Enter a direct image URL or upload a PNG/JPG logo file to display next to the school title.</p>
+                            </div>
+                        </div>
+
+                        <!-- Theme Selector -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Theme Color Palette</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                <button onclick="setTheme('emerald')" class="p-2 border rounded-lg text-xs font-semibold flex items-center gap-2 bg-emerald-700 text-white">
+                                    <div class="w-3 h-3 rounded-full bg-emerald-500"></div> DepEd Emerald
+                                </button>
+                                <button onclick="setTheme('blue')" class="p-2 border rounded-lg text-xs font-semibold flex items-center gap-2 bg-blue-800 text-white">
+                                    <div class="w-3 h-3 rounded-full bg-blue-400"></div> Royal Blue
+                                </button>
+                                <button onclick="setTheme('maroon')" class="p-2 border rounded-lg text-xs font-semibold flex items-center gap-2 bg-rose-900 text-white">
+                                    <div class="w-3 h-3 rounded-full bg-amber-400"></div> Heritage Maroon
+                                </button>
+                                <button onclick="setTheme('slate')" class="p-2 border rounded-lg text-xs font-semibold flex items-center gap-2 bg-slate-800 text-white">
+                                    <div class="w-3 h-3 rounded-full bg-slate-400"></div> Slate Dark
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question Customization Box -->
+                    <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                            <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fas fa-list-check text-emerald-600"></i> Edit School Quality Questions
+                            </h3>
+                            <button onclick="resetDefaultQuestions()" class="text-xs text-amber-600 hover:text-amber-800 font-semibold">
+                                <i class="fas fa-undo"></i> Reset Defaults
+                            </button>
+                        </div>
+
+                        <div id="settingsQuestionsEditor" class="space-y-3">
+                            <!-- Dynamically loaded question inputs -->
+                        </div>
+                    </div>
+
+                    <!-- Save Branding Settings Button -->
+                    <div>
+                        <button onclick="saveAdminSettings()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow transition">
+                            <i class="fas fa-save"></i> Save Settings & Refresh View
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 text-slate-400 text-xs py-6 border-t border-slate-700">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-1">
+            <p><strong class="text-slate-300">Personas National High School</strong> • Client Satisfaction Survey Portal</p>
+            <p>Designed for Continuous School Improvement & DepEd Compliance Standards.</p>
+        </div>
+    </footer>
+
+    <!-- View Response Details / Printable Receipt Modal -->
+    <div id="responseModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                    <i class="fas fa-receipt text-emerald-600"></i> Feedback Submission Receipt
+                </h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times text-lg"></i></button>
+            </div>
+
+            <div id="modalContent" class="space-y-4 text-xs text-slate-700">
+                <!-- Injected via JS -->
+            </div>
+
+            <div class="flex justify-end gap-2 border-t border-slate-100 pt-3">
+                <button onclick="printModalReceipt()" class="px-4 py-2 bg-slate-800 text-white font-bold rounded-lg hover:bg-slate-900 text-xs flex items-center gap-1.5">
+                    <i class="fas fa-print"></i> Print Receipt
+                </button>
+                <button onclick="closeModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-300 text-xs">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Default School-Related Quality Questions
+        const DEFAULT_QUESTIONS = [
+            { id: 'q1', title: '1. Service & Administrative Assistance', desc: 'Prompt, accurate, and courteous assistance from school office staff and personnel.' },
+            { id: 'q2', title: '2. Teaching & Learning Environment', desc: 'Quality of instruction, classroom atmosphere, and supportive academic guidance.' },
+            { id: 'q3', title: '3. Facilities, Cleanliness & Sanitation', desc: 'Cleanliness of classrooms, comfort rooms, campus grounds, and learning equipment.' },
+            { id: 'q4', title: '4. Safety, Security & Campus Order', desc: 'Visible security, peaceful school grounds, clear visitor handling, and student discipline.' },
+            { id: 'q5', title: '5. Communication & Accessibility', desc: 'Clear guidelines, timely announcements, and responsive school contact channels.' }
+        ];
+
+        // Global State
+        let currentTheme = 'emerald';
+        let adminUnlocked = false;
+        let schoolQuestions = JSON.parse(localStorage.getItem('pnhs_questions')) || DEFAULT_QUESTIONS;
+        let responses = JSON.parse(localStorage.getItem('pnhs_responses')) || [];
+        let schoolSettings = JSON.parse(localStorage.getItem('pnhs_settings')) || {
+            title: 'Personas National High School',
+            subtext: 'Department of Education • Division Office',
+            logoUrl: ''
+        };
+
+        let dimensionChartInstance = null;
+
+        window.onload = function() {
+            applySchoolSettings();
+            renderSchoolQuestionsForm();
+            renderSettingsQuestionsEditor();
+            updateLogoPreview();
+        };
+
+        // Render dynamic school questions in feedback form
+        function renderSchoolQuestionsForm() {
+            const container = document.getElementById('schoolQuestionsContainer');
+            container.innerHTML = '';
+
+            schoolQuestions.forEach((q, index) => {
+                const card = document.createElement('div');
+                card.className = "p-4 bg-slate-50/80 rounded-xl border border-slate-200 space-y-3";
+                card.innerHTML = `
+                    <div>
+                        <h4 class="font-bold text-sm text-slate-800">${q.title}</h4>
+                        <p class="text-xs text-slate-500">${q.desc}</p>
+                    </div>
+                    <div class="flex items-center justify-between sm:justify-start gap-2 pt-1" id="ratingGroup_${q.id}">
+                        ${[1,2,3,4,5].map(val => `
+                            <button type="button" onclick="setQuestionRating('${q.id}', ${val})" id="btn_${q.id}_${val}" class="rating-btn flex-1 sm:flex-none px-3 py-2 rounded-lg border border-slate-300 bg-white hover:bg-emerald-50 hover:border-emerald-400 font-semibold text-xs transition text-slate-700 text-center">
+                                ${val} <i class="far fa-star text-amber-400"></i>
+                            </button>
+                        `).join('')}
+                    </div>
+                    <input type="hidden" id="input_${q.id}" required value="" />
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Set Rating Handler for Form Buttons
+        function setQuestionRating(qId, value) {
+            document.getElementById(`input_${qId}`).value = value;
+            [1,2,3,4,5].forEach(v => {
+                const btn = document.getElementById(`btn_${qId}_${v}`);
+                if(v === value) {
+                    btn.className = "rating-btn flex-1 sm:flex-none px-3 py-2 rounded-lg border-2 border-emerald-600 bg-emerald-600 text-white font-bold text-xs transition text-center shadow-md";
+                } else {
+                    btn.className = "rating-btn flex-1 sm:flex-none px-3 py-2 rounded-lg border border-slate-300 bg-white hover:bg-emerald-50 font-semibold text-xs transition text-slate-700 text-center opacity-70";
+                }
+            });
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+
+            // Check if all rating inputs filled
+            for(let q of schoolQuestions) {
+                const val = document.getElementById(`input_${q.id}`).value;
+                if(!val) {
+                    alert(`Please provide a rating for: ${q.title}`);
+                    return;
+                }
+            }
+
+            const visitorName = document.getElementById('visitorName').value.trim() || 'Anonymous Visitor';
+            const visitorContact = document.getElementById('visitorContact').value.trim() || 'N/A';
+            const clientType = document.getElementById('clientType').value;
+            const officeVisited = document.getElementById('officeVisited').value;
+            const userFeedback = document.getElementById('userFeedback').value.trim();
+
+            const ratings = {};
+            let total = 0;
+            schoolQuestions.forEach(q => {
+                const val = parseInt(document.getElementById(`input_${q.id}`).value);
+                ratings[q.id] = val;
+                total += val;
+            });
+
+            const avgRating = (total / schoolQuestions.length).toFixed(1);
+
+            const newResponse = {
+                id: 'RESP-' + Date.now().toString().slice(-6),
+                date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                timestamp: new Date().toISOString(),
+                visitorName,
+                visitorContact,
+                clientType,
+                officeVisited,
+                ratings,
+                avgRating: parseFloat(avgRating),
+                userFeedback
+            };
+
+            responses.unshift(newResponse);
+            localStorage.setItem('pnhs_responses', JSON.stringify(responses));
+
+            // Show Confirmation Receipt
+            openResponseModal(newResponse);
+
+            // Reset Form
+            document.getElementById('feedbackForm').reset();
+            schoolQuestions.forEach(q => {
+                document.getElementById(`input_${q.id}`).value = '';
+                [1,2,3,4,5].forEach(v => {
+                    const btn = document.getElementById(`btn_${q.id}_${v}`);
+                    btn.className = "rating-btn flex-1 sm:flex-none px-3 py-2 rounded-lg border border-slate-300 bg-white hover:bg-emerald-50 font-semibold text-xs transition text-slate-700 text-center";
+                });
+            });
+        }
+
+        function switchTab(tab) {
+            if(tab === 'survey') {
+                document.getElementById('surveySection').classList.remove('hidden');
+                document.getElementById('adminSection').classList.add('hidden');
+            } else {
+                document.getElementById('surveySection').classList.add('hidden');
+                document.getElementById('adminSection').classList.remove('hidden');
+                if(adminUnlocked) {
+                    renderAdminDashboard();
+                }
+            }
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const pass = document.getElementById('adminPasswordInput').value;
+            if(pass === 'admin123' || pass === 'admin') {
+                adminUnlocked = true;
+                document.getElementById('adminLoginBox').classList.add('hidden');
+                document.getElementById('adminDashboardContent').classList.remove('hidden');
+                renderAdminDashboard();
+            } else {
+                alert('Invalid admin password. Try: admin123');
+            }
+        }
+
+        function lockAdmin() {
+            adminUnlocked = false;
+            document.getElementById('adminPasswordInput').value = '';
+            document.getElementById('adminLoginBox').classList.remove('hidden');
+            document.getElementById('adminDashboardContent').classList.add('hidden');
+        }
+
+        function switchAdminSubTab(subTab) {
+            if(subTab === 'analytics') {
+                document.getElementById('adminTabAnalytics').classList.remove('hidden');
+                document.getElementById('adminTabSettings').classList.add('hidden');
+                document.getElementById('subTabAnalytics').className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white shadow-sm";
+                document.getElementById('subTabSettings').className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200";
+                renderAdminDashboard();
+            } else {
+                document.getElementById('adminTabAnalytics').classList.add('hidden');
+                document.getElementById('adminTabSettings').classList.remove('hidden');
+                document.getElementById('subTabAnalytics').className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200";
+                document.getElementById('subTabSettings').className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white shadow-sm";
+            }
+        }
+
+        function renderAdminDashboard() {
+            // Stats Calculations
+            const total = responses.length;
+            document.getElementById('statTotalCount').innerText = total;
+
+            if(total === 0) {
+                document.getElementById('statAvgRating').innerText = "0.0 / 5";
+                document.getElementById('statSatisfactionPct').innerText = "0%";
+                document.getElementById('statTopClient').innerText = "N/A";
+                renderAdminTable();
+                renderChart([]);
+                return;
+            }
+
+            const grandTotalAvg = (responses.reduce((acc, r) => acc + r.avgRating, 0) / total).toFixed(1);
+            document.getElementById('statAvgRating').innerText = `${grandTotalAvg} / 5`;
+
+            const satisfiedCount = responses.filter(r => r.avgRating >= 4).length;
+            const satPct = Math.round((satisfiedCount / total) * 100);
+            document.getElementById('statSatisfactionPct').innerText = `${satPct}%`;
+
+            // Top Client Group
+            const categoryCounts = {};
+            responses.forEach(r => {
+                categoryCounts[r.clientType] = (categoryCounts[r.clientType] || 0) + 1;
+            });
+            const topCategory = Object.keys(categoryCounts).reduce((a, b) => categoryCounts[a] > categoryCounts[b] ? a : b, 'N/A');
+            document.getElementById('statTopClient').innerText = topCategory;
+
+            renderAdminTable();
+            renderChart(responses);
+        }
+
+        function renderAdminTable() {
+            const tbody = document.getElementById('adminTableBody');
+            tbody.innerHTML = '';
+
+            const search = document.getElementById('adminSearchInput').value.toLowerCase();
+            const officeFilter = document.getElementById('adminFilterOffice').value;
+
+            const filtered = responses.filter(r => {
+                const matchesOffice = (officeFilter === 'ALL' || r.officeVisited === officeFilter);
+                const matchesSearch = r.visitorName.toLowerCase().includes(search) ||
+                                      r.officeVisited.toLowerCase().includes(search) ||
+                                      (r.userFeedback && r.userFeedback.toLowerCase().includes(search));
+                return matchesOffice && matchesSearch;
+            });
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">No responses matching search or filters.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="p-3 font-medium text-slate-700 whitespace-nowrap">${r.date}</td>
+                    <td class="p-3 font-semibold text-slate-800">${r.visitorName}</td>
+                    <td class="p-3 text-slate-600">${r.clientType}</td>
+                    <td class="p-3 text-slate-600">${r.officeVisited}</td>
+                    <td class="p-3 text-center font-bold text-emerald-600">${r.avgRating} <i class="fas fa-star text-amber-400 text-[10px]"></i></td>
+                    <td class="p-3 text-slate-500 max-w-xs truncate">${r.userFeedback || '<span class="italic opacity-60">None</span>'}</td>
+                    <td class="p-3 text-right space-x-1 whitespace-nowrap">
+                        <button onclick='viewResponseDetails("${r.id}")' class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs" title="View"><i class="fas fa-eye"></i></button>
+                        <button onclick='deleteResponse("${r.id}")' class="p-1.5 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded text-xs" title="Delete"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderChart(data) {
+            const ctx = document.getElementById('dimensionChart').getContext('2d');
+            
+            // Calculate Average per Quality Dimension
+            const labels = schoolQuestions.map(q => q.title.split('.')[1] || q.title);
+            const dimensionAverages = schoolQuestions.map(q => {
+                if(data.length === 0) return 0;
+                const sum = data.reduce((acc, r) => acc + (r.ratings[q.id] || 0), 0);
+                return (sum / data.length).toFixed(2);
+            });
+
+            if(dimensionChartInstance) {
+                dimensionChartInstance.destroy();
+            }
+
+            dimensionChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Average Score (1 to 5)',
+                        data: dimensionAverages,
+                        backgroundColor: 'rgba(16, 185, 129, 0.75)',
+                        borderColor: 'rgb(5, 150, 105)',
+                        borderWidth: 1.5,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, max: 5 }
+                    }
+                }
+            });
+        }
+
+        function applySchoolSettings() {
+            document.getElementById('headerTitle').innerText = schoolSettings.title;
+            document.getElementById('headerSubtext').innerText = schoolSettings.subtext;
+            document.getElementById('settingSchoolTitle').value = schoolSettings.title;
+            document.getElementById('settingSubtext').value = schoolSettings.subtext;
+            document.getElementById('settingLogoUrl').value = schoolSettings.logoUrl || '';
+
+            const logoImg = document.getElementById('headerSchoolLogo');
+            const logoFallback = document.getElementById('headerLogoFallback');
+
+            if(schoolSettings.logoUrl && schoolSettings.logoUrl.trim() !== '') {
+                logoImg.src = schoolSettings.logoUrl;
+                logoImg.classList.remove('hidden');
+                logoFallback.classList.add('hidden');
+            } else {
+                logoImg.classList.add('hidden');
+                logoFallback.classList.remove('hidden');
+            }
+        }
+
+        function updateLogoPreview() {
+            const url = document.getElementById('settingLogoUrl').value.trim();
+            const previewImg = document.getElementById('settingLogoPreview');
+            const previewFallback = document.getElementById('settingLogoPreviewFallback');
+
+            if(url) {
+                previewImg.src = url;
+                previewImg.classList.remove('hidden');
+                previewFallback.classList.add('hidden');
+            } else {
+                previewImg.classList.add('hidden');
+                previewFallback.classList.remove('hidden');
+            }
+        }
+
+        function handleLogoFileUpload(event) {
+            const file = event.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('settingLogoUrl').value = e.target.result;
+                    updateLogoPreview();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function renderSettingsQuestionsEditor() {
+            const container = document.getElementById('settingsQuestionsEditor');
+            container.innerHTML = '';
+
+            schoolQuestions.forEach((q, idx) => {
+                const div = document.createElement('div');
+                div.className = "p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2";
+                div.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600">Question Title ${idx+1}</label>
+                            <input type="text" id="edit_title_${q.id}" value="${q.title}" class="w-full p-1.5 text-xs border rounded bg-white" />
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600">Description / Subtext</label>
+                            <input type="text" id="edit_desc_${q.id}" value="${q.desc}" class="w-full p-1.5 text-xs border rounded bg-white" />
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function saveAdminSettings() {
+            schoolSettings.title = document.getElementById('settingSchoolTitle').value.trim();
+            schoolSettings.subtext = document.getElementById('settingSubtext').value.trim();
+            schoolSettings.logoUrl = document.getElementById('settingLogoUrl').value.trim();
+
+            localStorage.setItem('pnhs_settings', JSON.stringify(schoolSettings));
+
+            // Save Questions
+            schoolQuestions.forEach(q => {
+                const newTitle = document.getElementById(`edit_title_${q.id}`).value;
+                const newDesc = document.getElementById(`edit_desc_${q.id}`).value;
+                q.title = newTitle;
+                q.desc = newDesc;
+            });
+            localStorage.setItem('pnhs_questions', JSON.stringify(schoolQuestions));
+
+            applySchoolSettings();
+            renderSchoolQuestionsForm();
+            alert('Settings and School Logo updated successfully!');
+        }
+
+        function resetDefaultQuestions() {
+            if(confirm('Reset all questions back to default School Quality Dimensions?')) {
+                schoolQuestions = JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
+                localStorage.setItem('pnhs_questions', JSON.stringify(schoolQuestions));
+                renderSettingsQuestionsEditor();
+                renderSchoolQuestionsForm();
+            }
+        }
+
+        function setTheme(theme) {
+            const header = document.getElementById('mainHeader');
+            currentTheme = theme;
+            if(theme === 'emerald') {
+                header.className = "bg-emerald-800 text-white shadow-lg border-b-4 border-amber-400 transition-colors duration-300";
+            } else if(theme === 'blue') {
+                header.className = "bg-blue-900 text-white shadow-lg border-b-4 border-blue-400 transition-colors duration-300";
+            } else if(theme === 'maroon') {
+                header.className = "bg-rose-950 text-white shadow-lg border-b-4 border-amber-400 transition-colors duration-300";
+            } else if(theme === 'slate') {
+                header.className = "bg-slate-900 text-white shadow-lg border-b-4 border-slate-500 transition-colors duration-300";
+            }
+        }
+
+        function openResponseModal(resp) {
+            const modal = document.getElementById('responseModal');
+            const content = document.getElementById('modalContent');
+
+            content.innerHTML = `
+                <div class="border-b border-slate-200 pb-3">
+                    <p class="font-bold text-slate-800 text-sm">${schoolSettings.title}</p>
+                    <p class="text-slate-500 text-[11px]">Submission ID: ${resp.id} • ${resp.date}</p>
+                </div>
+
+                <div class="space-y-1">
+                    <p><strong>Visitor Name:</strong> ${resp.visitorName}</p>
+                    <p><strong>Contact Info:</strong> ${resp.visitorContact}</p>
+                    <p><strong>Client Category:</strong> ${resp.clientType}</p>
+                    <p><strong>Office Visited:</strong> ${resp.officeVisited}</p>
+                    <p><strong>Overall Average Rating:</strong> <span class="font-bold text-emerald-600">${resp.avgRating} / 5</span></p>
+                </div>
+
+                <div class="border-t border-slate-200 pt-2 space-y-1">
+                    <p class="font-bold text-slate-700">Detailed Ratings:</p>
+                    <ul class="space-y-1 text-slate-600">
+                        ${schoolQuestions.map(q => `
+                            <li class="flex justify-between">
+                                <span class="truncate max-w-[240px]">${q.title}:</span>
+                                <span class="font-bold">${resp.ratings[q.id] || 'N/A'} <i class="fas fa-star text-amber-400 text-[10px]"></i></span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+
+                ${resp.userFeedback ? `
+                <div class="border-t border-slate-200 pt-2">
+                    <p class="font-bold text-slate-700">Comments / Suggestions:</p>
+                    <p class="italic bg-slate-50 p-2 rounded border border-slate-200 text-slate-600 mt-1">${resp.userFeedback}</p>
+                </div>` : ''}
+            `;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('responseModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function viewResponseDetails(id) {
+            const resp = responses.find(r => r.id === id);
+            if(resp) openResponseModal(resp);
+        }
+
+        function deleteResponse(id) {
+            if(confirm('Are you sure you want to delete this response record?')) {
+                responses = responses.filter(r => r.id !== id);
+                localStorage.setItem('pnhs_responses', JSON.stringify(responses));
+                renderAdminDashboard();
+            }
+        }
+
+        function printModalReceipt() {
+            window.print();
+        }
+
+        function exportToCSV() {
+            if(responses.length === 0) {
+                alert('No data available to export.');
+                return;
+            }
+
+            let csv = 'ID,Date,Visitor Name,Contact,Category,Office Visited,Average Rating,Comments\n';
+            responses.forEach(r => {
+                const commentClean = (r.userFeedback || '').replace(/"/g, '""');
+                csv += `"${r.id}","${r.date}","${r.visitorName}","${r.visitorContact}","${r.clientType}","${r.officeVisited}","${r.avgRating}","${commentClean}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `PNHS_CSM_Feedback_${new Date().toISOString().slice(0,10)}.csv`);
+            a.click();
+        }
+
+        function seedSampleData() {
+            const names = ['Maria Santos', 'Juan Dela Cruz', 'Elena Ramos', 'Roberto Garcia', 'Anna Mendoza'];
+            const offices = ["Principal's Office", "Registrar / Records", "Guidance Office", "Faculty / Teachers", "Cashier / Accounting"];
+            const categories = ['Parent/Guardian', 'Student', 'Alumni', 'General Public / Visitor'];
+
+            const sampleList = [];
+            for(let i = 0; i < 5; i++) {
+                const ratings = {};
+                let total = 0;
+                schoolQuestions.forEach(q => {
+                    const r = Math.floor(Math.random() * 2) + 4; // 4 or 5
+                    ratings[q.id] = r;
+                    total += r;
+                });
+
+                sampleList.push({
+                    id: 'RESP-' + (100000 + i),
+                    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                    timestamp: new Date().toISOString(),
+                    visitorName: names[i],
+                    visitorContact: `0917${Math.floor(1000000 + Math.random() * 9000000)}`,
+                    clientType: categories[i % categories.length],
+                    officeVisited: offices[i % offices.length],
+                    ratings: ratings,
+                    avgRating: parseFloat((total / schoolQuestions.length).toFixed(1)),
+                    userFeedback: 'Great service and very accommodating school staff!'
+                });
+            }
+
+            responses = [...sampleList, ...responses];
+            localStorage.setItem('pnhs_responses', JSON.stringify(responses));
+            renderAdminDashboard();
+            alert('5 sample feedback responses seeded successfully!');
+        }
+    </script>
+</body>
+</html>
